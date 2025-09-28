@@ -11,3 +11,15 @@
 4. Web đơn giản, bắt buộc sử dụng **.NET Framework 2.0**, sử dụng web server là IIS, dùng file hosts để tự tạo domain, gắn domain này vào iis, file index.html có sử dụng html css js để xây dựng giao diện nhập được các input cho bài toán, dùng mã js để tiền xử lý dữ liệu, js để gửi lên backend. backend là api.aspx, trong code của api.aspx.cs thì lấy được các input mà js gửi lên, rồi sử dụng được DLL đa năng trên. kết quả gửi lại json cho client, js phía client sẽ nhận được json này hậu xử lý để thay đổi giao diện theo dữ liệu nhận dược, phải có dấu án cá nhân. keyword: c# window web => **ASP.NET Web Application (.NET Framework)** + tham khảo link chatgpt thầy gửi. project web này biên dịch ra DLL, phải kết hợp với IIS mới chạy được.
 
 ## Bài làm
+
+### Kết quả của ConsoleApp
+
+<img width="1483" height="762" alt="image" src="https://github.com/user-attachments/assets/9f5830b2-e395-4ed5-a455-1ed255ffd5fa" />
+
+### Kết quả của WindowsFormsApp
+
+<img width="565" height="352" alt="image" src="https://github.com/user-attachments/assets/ba23d3fa-d924-469d-b8d7-1046390818cf" />
+
+### Kết quả của WebApplication
+
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/d6331263-d366-44e0-b4fa-067d11844f3d" />
