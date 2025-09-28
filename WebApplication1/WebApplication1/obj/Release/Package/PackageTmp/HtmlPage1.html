@@ -1,0 +1,243 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Memory Game</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f0f0f0;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            margin: 20px;
+        }
+
+        #menu, #gameScreen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+            #menu.active, #gameScreen.active {
+                display: flex;
+            }
+
+            #menu select, #menu button {
+                margin: 10px;
+                padding: 8px 15px;
+                font-size: 16px;
+            }
+
+        #info {
+            margin: 10px;
+            font-size: 18px;
+        }
+
+        #game {
+            display: grid;
+            grid-gap: 10px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #3498db;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .flipped {
+            background: #2ecc71;
+            cursor: default;
+        }
+
+        .matched {
+            background: #95a5a6;
+            cursor: default;
+        }
+
+        #restart, #backMenu {
+            margin-top: 15px;
+            padding: 8px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background: #e67e22;
+            color: white;
+            cursor: pointer;
+        }
+
+            #restart:hover, #backMenu:hover {
+                background: #d35400;
+            }
+    </style>
+</head>
+<body>
+    <h1>🎮 Memory Game</h1>
+
+    <!-- Màn hình chọn chế độ -->
+    <div id="menu" class="active">
+        <label for="difficulty">Chọn độ khó:</label>
+        <select id="difficulty">
+            <option value="easy">Easy (4x4)</option>
+            <option value="medium">Medium (6x6)</option>
+            <option value="hard">Hard (8x8)</option>
+        </select>
+        <button id="startBtn">▶️ Start</button>
+    </div>
+
+    <!-- Màn hình chơi game -->
+    <div id="gameScreen">
+        <div id="info">
+            ⏱️ Thời gian: <span id="time">0</span> giây | ⭐ Điểm: <span id="score">1000</span>
+        </div>
+        <div>
+            <button id="restart">🔄 Restart</button>
+            <button id="backMenu">⬅️ Menu</button>
+        </div>
+        <div id="game"></div>
+    </div>
+
+    <script>
+    const allIcons = [
+      "🍎","🍌","🍇","🍊","🍉","🍓","🍍","🥝","🥑","🍒","🍈","🍋",
+      "🥥","🥕","🌽","🍆","🍅","🥔","🥦","🧄","🧅","🍄","🥜","🌰",
+      "🍔","🍟","🍕","🌭","🍿","🍩","🍪","🎂","🍫","🍬","🍭","🧁"
+    ];
+    let cards = [];
+    let firstCard, lockBoard, matches;
+    let time, timer, score, gameStarted, pairs;
+
+    const menu = document.getElementById("menu");
+    const gameScreen = document.getElementById("gameScreen");
+    const game = document.getElementById("game");
+    const timeEl = document.getElementById("time");
+    const scoreEl = document.getElementById("score");
+    const restartBtn = document.getElementById("restart");
+    const backMenuBtn = document.getElementById("backMenu");
+    const startBtn = document.getElementById("startBtn");
+    const difficultySelect = document.getElementById("difficulty");
+
+    restartBtn.addEventListener("click", initGame);
+    backMenuBtn.addEventListener("click", backToMenu);
+    startBtn.addEventListener("click", () => {
+      menu.classList.remove("active");
+      gameScreen.classList.add("active");
+      initGame();
+    });
+
+    function initGame() {
+      let difficulty = difficultySelect.value;
+      let gridSize;
+      if (difficulty === "easy") { gridSize = 4; pairs = 8; }
+      if (difficulty === "medium") { gridSize = 6; pairs = 18; }
+      if (difficulty === "hard") { gridSize = 8; pairs = 32; }
+
+      game.style.gridTemplateColumns = `repeat(${gridSize}, 80px)`;
+      game.style.gridTemplateRows = `repeat(${gridSize}, 80px)`;
+
+      let chosenIcons = allIcons.slice(0, pairs);
+      cards = [...chosenIcons, ...chosenIcons];
+      cards.sort(() => 0.5 - Math.random());
+
+      firstCard = null;
+      lockBoard = false;
+      matches = 0;
+      time = 0;
+      score = 1000;
+      gameStarted = false;
+
+      clearInterval(timer);
+      timeEl.innerText = time;
+      scoreEl.innerText = score;
+
+      game.innerHTML = "";
+
+      cards.forEach((icon, index) => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.dataset.icon = icon;
+        card.dataset.index = index;
+        card.innerText = "?";
+        card.addEventListener("click", flipCard);
+        game.appendChild(card);
+      });
+    }
+
+    function flipCard() {
+      if (lockBoard) return;
+      if (this.classList.contains("flipped") || this.classList.contains("matched")) return;
+
+      if (!gameStarted) {
+        gameStarted = true;
+        timer = setInterval(updateTime, 1000);
+      }
+
+      this.innerText = this.dataset.icon;
+      this.classList.add("flipped");
+
+      if (!firstCard) {
+        firstCard = this;
+      } else {
+        checkMatch(this);
+      }
+    }
+
+    function checkMatch(secondCard) {
+      if (firstCard.dataset.icon === secondCard.dataset.icon) {
+        firstCard.classList.add("matched");
+        secondCard.classList.add("matched");
+        firstCard.removeEventListener("click", flipCard);
+        secondCard.removeEventListener("click", flipCard);
+        matches++;
+        resetTurn();
+
+        if (matches === pairs) {
+          clearInterval(timer);
+          setTimeout(() => {
+            alert("🎉 Bạn đã thắng!\n⏱️ Thời gian: " + time + " giây\n⭐ Điểm: " + score);
+          }, 200);
+        }
+      } else {
+        lockBoard = true;
+        setTimeout(() => {
+          firstCard.innerText = "?";
+          secondCard.innerText = "?";
+          firstCard.classList.remove("flipped");
+          secondCard.classList.remove("flipped");
+          resetTurn();
+        }, 1000);
+      }
+    }
+
+    function resetTurn() {
+      [firstCard, lockBoard] = [null, false];
+    }
+
+    function updateTime() {
+      time++;
+      timeEl.innerText = time;
+      score = Math.max(1000 - time * 10, 0);
+      scoreEl.innerText = score;
+    }
+
+    function backToMenu() {
+      clearInterval(timer);
+      game.innerHTML = "";
+      gameScreen.classList.remove("active");
+      menu.classList.add("active");
+    }
+    </script>
+</body>
+</html>

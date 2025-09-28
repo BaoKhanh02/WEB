@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://go.microsoft.com/fwlink/?LinkID=208121. -->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\Admin\source\repos\WebApplication1</_PublishTargetUrl>
+    <History>True|2025-09-28T15:32:56.5088358Z||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="bin/MemoryGame.dll">
+      <publishTime>09/28/2025 22:12:38</publishTime>
+    </File>
+    <File Include="bin/MemoryGame.pdb">
+      <publishTime>09/28/2025 22:12:38</publishTime>
+    </File>
+    <File Include="bin/WebApplication1.dll">
+      <publishTime>09/28/2025 22:32:56</publishTime>
+    </File>
+    <File Include="bin/WebApplication1.pdb">
+      <publishTime>09/28/2025 22:32:56</publishTime>
+    </File>
+    <File Include="HtmlPage1.html">
+      <publishTime>09/28/2025 22:30:24</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>09/28/2025 22:32:56</publishTime>
+    </File>
+    <File Include="WebForm1.aspx">
+      <publishTime>09/28/2025 22:30:24</publishTime>
+    </File>
+  </ItemGroup>
+</Project>
